@@ -244,14 +244,18 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         
         for (uint r = 0; r < rows - 1; r++) {
             for (uint c = 0; c < cols - 1; c++) {
-                auto g_x = res_horiz(r, c);
-                auto g_y = res_vert(r, c);
+                double g_x = res_horiz(r, c);
+                double g_y = res_vert(r, c);
                 magnitude(r, c) = std::sqrt(g_x * g_x + g_y * g_y);
                 direction(r, c) = std::atan2(g_y, g_x);
             }
         }
         
         //DEBUGGING STAGE:
+        Image temp(Map_to_Img(magnitude));
+        save_image(temp, "magn.bmp");
+        Image temp2(Map_to_Img(direction));
+        save_image(temp2, "dir.bmp");
         //Image temp(Map_to_Img(res_vert));
         //save_image(temp, "temp.bmp");
         //================
