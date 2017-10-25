@@ -10,6 +10,9 @@
 #include "linear.h"
 #include "argvparser.h"
 
+// Matrix
+#include "matrix.h"
+
 using std::string;
 using std::vector;
 using std::ifstream;
@@ -132,7 +135,13 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         // PLACE YOUR CODE HERE
         // Remove this sample code and place your feature extraction code here
         
-        // 1.
+        // 1. Using sobel Vertical & Horizontal filters:
+        Matrix<double> Vertical(3, 1);
+        Vertical(0,0) = 1;
+        Vertical(1,0) = 0;
+        Vertical(2,0) = -1;
+        Matrix<double> Horizontal = {-1, 0, 1};
+        
         
         // 2.
         
