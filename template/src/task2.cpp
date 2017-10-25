@@ -235,23 +235,37 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         // HORIZONTAL:
         for (uint r = 0; r < rows; r++) {
             for (uint c = 1; c < cols - 1; c++) {
-                res_vert(r, c) = gray_img(r, c+1) - gray_img(r, c-1);
+                res_horiz(r, c) = gray_img(r, c+1) - gray_img(r, c-1);
             }
         }
         
-        Image temp(Map_to_Img(res_vert));
-        save_image(temp, "temp.bmp");
+        Matrix<double> magnitude(rows, cols);
+        Matrix<double> direction(rows, cols);
+        
+        for (uint r = 0; r < rows - 1; r++) {
+            for (uint c = 0; c < cols - 1; c++) {
+                auto g_x = res_horiz(r, c);
+                auto g_y = res_vert(r, c);
+                magnitude(r, c) = std::sqrt(g_x * g_x + g_y * g_y);
+                direction(r, c) = std::atan2(g_y, g_x);
+            }
+        }
+        
+        //DEBUGGING STAGE:
+        //Image temp(Map_to_Img(res_vert));
+        //save_image(temp, "temp.bmp");
+        //================
         
         // 2.
         
         // 3. 
         
-        /*
+        
         vector<float> one_image_features;
         one_image_features.push_back(1.0);
         features->push_back(make_pair(one_image_features, 1));
         // End of sample code
-        */
+        
 
     }
 }
