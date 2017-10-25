@@ -88,17 +88,17 @@ void SavePredictions(const TFileList& file_list,
 */
 
 BMP grayscale(BMP &image) {
-    uint rows = image.tellWidth();
-    uint cols = image.tellHeight();
+    uint rows = image.TellWidth();
+    uint cols = image.TellHeight();
     
     for (uint i = 0; i < rows; i++) {
         for (uint j = 0; j < cols; j++) {
-            RGBApixel pixel = image.getPixel(i,j);
+            RGBApixel pixel = image.GetPixel(i,j);
             uint Y = 0.299 * pixel.Red + 0.587 * pixel.Green + 0.114 * pixel.Blue;
             RGBApixel temp;
             temp.Red = temp.Green = temp.Blue = Y;
             temp.Alpha = 255;
-            image.setPixel(i, j, temp);
+            image.SetPixel(i, j, temp);
         }
     }
     return image;
