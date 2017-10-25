@@ -239,6 +239,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
             }
         }
         
+        // Calculating MAGNITUDE & DIRECTION.
         Matrix<double> magnitude(rows, cols);
         Matrix<double> direction(rows, cols);
         
@@ -247,7 +248,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
                 double g_x = res_horiz(r, c);
                 double g_y = res_vert(r, c);
                 magnitude(r, c) = std::sqrt(g_x * g_x + g_y * g_y);
-                direction(r, c) = std::atan2(g_y, g_x);
+                direction(r, c) = std::atan2(g_x, g_y);
             }
         }
         
