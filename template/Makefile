@@ -1,8 +1,8 @@
 CXX = g++
-CXXFLAGS = -O2 -g -Wall -std=c++0x
+CXXFLAGS = -std=c++0x
 
 # Strict compiler options
-CXXFLAGS += -Werror -Wformat-security -Wignored-qualifiers -Winit-self \
+#CXXFLAGS += -Werror -Wformat-security -Wignored-qualifiers -Winit-self \
 		-Wswitch-default -Wfloat-equal -Wshadow -Wpointer-arith \
 		-Wtype-limits -Wempty-body -Wlogical-op \
 		-Wmissing-field-initializers -Wctor-dtor-privacy \

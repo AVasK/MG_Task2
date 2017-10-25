@@ -76,13 +76,69 @@ void SavePredictions(const TFileList& file_list,
     stream.close();
 }
 
+/*
+|||||||||||||||||||||||||||||||||||||||||||||||
+
+*****  *****    *   *** **
+** *   **  *   * *   ****
+**  *  ****   *****   **
+*****  **  * **   ** **
+
+|||||||||||||||||||||||||||||||||||||||||||||||
+*/
+
+BMP grayscale(BMP &image) {
+    uint rows = image.tellWidth();
+    uint cols = image.tellHeight();
+    
+    for (uint i = 0; i < rows; i++) {
+        for (uint j = 0; j < cols; j++) {
+            RGBApixel pixel = image.getPixel(i,j);
+            uint Y = 0.299 * pixel.Red + 0.587 * pixel.Green + 0.114 * pixel.Blue;
+            RGBApixel temp;
+            temp.Red = temp.Green = temp.Blue = Y;
+            temp.Alpha = 255;
+            image.setPixel(i, j, temp);
+        }
+    }
+    return image;
+}
+
+
+/*
+|||||||||||||||||||||||||||||||||||||||||||||||
+***********************************************
+|||||||||||||||||||||||||||||||||||||||||||||||
+
+*****  *****  *****  *****  **
+**     **  *  **  *  **     **
+ **   **  *  *****  *****  **
+ `**  **  *  **  *  **     **
+*****  *****  *****  *****  ******
+
+|||||||||||||||||||||||||||||||||||||||||||||||
+***********************************************
+|||||||||||||||||||||||||||||||||||||||||||||||
+*/
+
+
 // Exatract features from dataset.
 // You should implement this function by yourself =)
+// Roger that! 
+
 void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
     for (size_t image_idx = 0; image_idx < data_set.size(); ++image_idx) {
         
         // PLACE YOUR CODE HERE
         // Remove this sample code and place your feature extraction code here
+        
+        // 1.
+        
+        // 2.
+        
+        // 3. 
+        
+        
         vector<float> one_image_features;
         one_image_features.push_back(1.0);
         features->push_back(make_pair(one_image_features, 1));
