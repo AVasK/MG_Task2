@@ -12,6 +12,7 @@
 
 // Matrix
 #include "matrix.h"
+#include <tuple>
 
 using std::string;
 using std::vector;
@@ -111,6 +112,55 @@ Grayscale to_grayscale(BMP image) {
 }
 
 
+Image Gray_to_Img(Grayscale gray) {
+    auto rows = gray.n_rows;
+    auto cols = gray.n_cols;
+    
+    Image temp(rows, cols);
+    
+    for (uint r = 0; r < rows; r++) {
+        for (uint c = 0; c < cols; c++) {
+            temp(r,c) = std::tie(gray(r,c), gray(r,c), gray(r,c));
+        }
+    }
+    return temp;
+}
+
+Image Map_to_Img(Matrix<double> gray) {
+    auto rows = gray.n_rows;
+    auto cols = gray.n_cols;
+    
+    Image temp(rows, cols);
+    
+    for (uint r = 0; r < rows; r++) {
+        for (uint c = 0; c < cols; c++) {
+            temp(r,c) = std::tie(gray(r,c), gray(r,c), gray(r,c));
+        }
+    }
+    return temp;
+}
+
+void save_image(const Image &im, const char *path)
+{
+    BMP out;
+    out.SetSize(im.n_cols, im.n_rows);
+
+    uint r, g, b;
+    RGBApixel p;
+    p.Alpha = 255;
+    for (uint i = 0; i < im.n_rows; ++i) {
+        for (uint j = 0; j < im.n_cols; ++j) {
+            std::tie(r, g, b) = im(i, j);
+            p.Red = r; p.Green = g; p.Blue = b;
+            out.SetPixel(j, i, p);
+        }
+    }
+
+    if (!out.WriteToFile(path))
+        throw string("Error writing file ") + string(path);
+}
+
+
 /*
 |||||||||||||||||||||||||||||||||||||||||||||||
 ***********************************************
@@ -189,15 +239,19 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
             }
         }
         
+        Image temp(Map_to_Img(res_vert));
+        save_image(temp, "temp.bmp");
+        
         // 2.
         
         // 3. 
         
-        
+        /*
         vector<float> one_image_features;
         one_image_features.push_back(1.0);
         features->push_back(make_pair(one_image_features, 1));
         // End of sample code
+        */
 
     }
 }
