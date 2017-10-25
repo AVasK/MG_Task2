@@ -25,6 +25,9 @@ using std::endl;
 
 using CommandLineProcessing::ArgvParser;
 
+typedef Matrix<std::tuple<uint, uint, uint>> Image; // for the sake of convenience.
+typedef Matrix<int> Grayscale;
+
 typedef vector<pair<BMP*, int> > TDataSet;
 typedef vector<pair<string, int> > TFileList;
 typedef vector<pair<vector<float>, int> > TFeatures;
@@ -90,21 +93,21 @@ void SavePredictions(const TFileList& file_list,
 |||||||||||||||||||||||||||||||||||||||||||||||
 */
 
-BMP grayscale(BMP &image) {
+// Returns entity of type Grayscale == Matrix<int>.
+Grayscale to_grayscale(BMP image) {
     uint rows = image.TellWidth();
     uint cols = image.TellHeight();
+    
+    Grayscale img(cols, rows);
     
     for (uint i = 0; i < rows; i++) {
         for (uint j = 0; j < cols; j++) {
             RGBApixel pixel = image.GetPixel(i,j);
             uint Y = 0.299 * pixel.Red + 0.587 * pixel.Green + 0.114 * pixel.Blue;
-            RGBApixel temp;
-            temp.Red = temp.Green = temp.Blue = Y;
-            temp.Alpha = 255;
-            image.SetPixel(i, j, temp);
+            img(j, i) = Y;
         }
     }
-    return image;
+    return img;
 }
 
 
@@ -135,13 +138,56 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         // PLACE YOUR CODE HERE
         // Remove this sample code and place your feature extraction code here
         
+        // 0. Getting images & Grayscaling them:
+        auto img = data_set[image_idx].first; // Should be (BMP *)
+        Grayscale gray_img = to_grayscale(*img); // << GRAYSCALE IMAGE;
+        
         // 1. Using sobel Vertical & Horizontal filters:
+        
+        /*
+         /----------\
+         | -1, 0, 1 |  <- HORIZONTAL
+         \----------/
+        */ 
+        
+        /* 
+         
+         ____
+         |1 |
+         |0 |  <- VERTICAL
+         |-1|
+         ----
+        
+        
+        */
+        /*
         Matrix<double> Vertical(3, 1);
         Vertical(0,0) = 1;
         Vertical(1,0) = 0;
         Vertical(2,0) = -1;
         Matrix<double> Horizontal = {-1, 0, 1};
+        */
         
+        // Actually making convolutions:
+        auto rows = gray_img.n_rows;
+        auto cols = gray_img.n_cols;
+        
+        Matrix<double> res_vert(rows, cols);
+        Matrix<double> res_horiz(rows, cols);
+        
+        // VERTICAL:
+        for (uint r = 1; r < rows - 1; r++) {
+            for (uint c = 0; c < cols; c++) {
+                res_vert(r, c) = gray_img(r-1, c) + gray_img(r+1, c);
+            }
+        }
+        
+        // HORIZONTAL:
+        for (uint r = 0; r < rows; r++) {
+            for (uint c = 1; c < cols - 1; c++) {
+                res_vert(r, c) = gray_img(r, c+1) - gray_img(r, c-1);
+            }
+        }
         
         // 2.
         
