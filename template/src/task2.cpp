@@ -173,7 +173,9 @@ vector<float> hist(Matrix<double> Magn, Matrix<double> Dir) {
             cout << Dir(r, c) << "-- Angle\n";
             cout << partition << "<- PARTITION\n";
             if (!std::isnan(Dir(r, c)) && !std::isnan(Magn(r, c))) {
-                histogram[partition] += (Magn(r, c) <= 1000) ? Magn(r, c) : 1000; 
+                if (partition < ANGULAR_SEGMENTS && partition >= 0) {
+                    histogram[partition] += (Magn(r, c) <= 1000) ? Magn(r, c) : 1000; 
+                }
             }
         }
         cout << "Halt!\n";
