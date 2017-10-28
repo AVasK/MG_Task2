@@ -34,7 +34,7 @@ typedef vector<pair<string, int> > TFileList;
 typedef vector<pair<vector<float>, int> > TFeatures;
 
 // C0NSTANTS:
-const int SEGMENTS = 3;
+const int SEGMENTS = 12;
 const int ANGULAR_SEGMENTS = 8; 
 
 // Load list of files and its labels from 'data_file' and
