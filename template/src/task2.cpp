@@ -85,12 +85,10 @@ void SavePredictions(const TFileList& file_list,
 
 /*
 |||||||||||||||||||||||||||||||||||||||||||||||
-
 *****  *****    *   *** **
 ** *   **  *   * *   ****
 **  *  ****   *****   **
 *****  **  * **   ** **
-
 |||||||||||||||||||||||||||||||||||||||||||||||
 */
 
@@ -165,13 +163,11 @@ void save_image(const Image &im, const char *path)
 |||||||||||||||||||||||||||||||||||||||||||||||
 ***********************************************
 |||||||||||||||||||||||||||||||||||||||||||||||
-
 *****  *****  *****  *****  **
 **     **  *  **  *  **     **
  **   **  *  *****  *****  **
  `**  **  *  **  *  **     **
 *****  *****  *****  *****  ******
-
 |||||||||||||||||||||||||||||||||||||||||||||||
 ***********************************************
 |||||||||||||||||||||||||||||||||||||||||||||||
@@ -228,7 +224,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         // VERTICAL:
         for (uint r = 1; r < rows - 1; r++) {
             for (uint c = 0; c < cols; c++) {
-                res_vert(r, c) = gray_img(r-1, c) + gray_img(r+1, c);
+                res_vert(r, c) = gray_img(r-1, c) - gray_img(r+1, c);
             }
         }
         
@@ -236,6 +232,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         for (uint r = 0; r < rows; r++) {
             for (uint c = 1; c < cols - 1; c++) {
                 res_horiz(r, c) = gray_img(r, c+1) - gray_img(r, c-1);
+
             }
         }
         
@@ -248,7 +245,8 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
                 double g_x = res_horiz(r, c);
                 double g_y = res_vert(r, c);
                 magnitude(r, c) = std::sqrt(g_x * g_x + g_y * g_y);
-                direction(r, c) = std::atan2(g_x, g_y);
+                direction(r, c) = 180/3.1415926 * std::atan2(g_y, g_x);
+				direction(r, c) = (direction(r, c) > 0.0) ? direction(r, c) : (360.0 + direction(r, c));
             }
         }
         
@@ -260,6 +258,19 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         //Image temp(Map_to_Img(res_vert));
         //save_image(temp, "temp.bmp");
         //================
+
+		// 1 Rad = 180/pi Deg
+		// 1 Deg = pi/180 Rad
+		
+		double max = 0;
+		for (uint r = 0; r < rows - 1; r++) {
+			for(uint c = 0; c < cols - 1; c++) {
+				cout << int(direction(r, c)) << " ";
+				if (direction(r,c) > max) max = direction(r,c);
+			}
+			cout << '\n';
+		}
+		cout << "max angle (deg) " << max;
         
         // 2.
         
