@@ -33,6 +33,10 @@ typedef vector<pair<BMP*, int> > TDataSet;
 typedef vector<pair<string, int> > TFileList;
 typedef vector<pair<vector<float>, int> > TFeatures;
 
+// C0NSTANTS:
+const int SEGMENTS = 8;
+const int CELL_SIZE = 8; 
+
 // Load list of files and its labels from 'data_file' and
 // stores it in 'file_list'
 void LoadFileList(const string& data_file, TFileList* file_list) {
@@ -158,6 +162,26 @@ void save_image(const Image &im, const char *path)
         throw string("Error writing file ") + string(path);
 }
 
+// Calculating HOG of submatrices:
+
+vector<vector<int>> hog(Matrix<double> Magn, Matrix<double> Dir) {
+    
+}
+
+
+vector<int> hist(Matrix<double> Magn, Matrix<double> Dir) {
+    vector<int> histogram(SEGMENTS, 0);
+    
+    for (int r = 0; r < Magn.n_rows; r++) {
+        for (int c = 0; c < Magn.n_cols; c++) {
+            int partition = int(Magn(r,c) / double(360/SEGMENTS));
+            if (Magn(r, c) == 360) { partition = 0; } // LOOPed;
+            histogram[partition]++;
+        }
+    }
+    return histogram;
+}
+
 
 /*
 |||||||||||||||||||||||||||||||||||||||||||||||
@@ -262,6 +286,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
 		// 1 Rad = 180/pi Deg
 		// 1 Deg = pi/180 Rad
 		
+        /*
 		double max = 0;
 		for (uint r = 0; r < rows - 1; r++) {
 			for(uint c = 0; c < cols - 1; c++) {
@@ -270,9 +295,12 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
 			}
 			cout << '\n';
 		}
-		cout << "max angle (deg) " << max;
         
-        // 2.
+		cout << "max angle (deg) " << max;
+        */
+        
+        // 2. Calculating HOG:
+        //auto HOG = hog(magnitude, direction);
         
         // 3. 
         
