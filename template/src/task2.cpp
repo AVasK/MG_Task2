@@ -221,10 +221,20 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         Matrix<double> res_vert(rows, cols);
         Matrix<double> res_horiz(rows, cols);
         
+		// Trying to add edge mirroring
         // VERTICAL:
         for (uint r = 1; r < rows - 1; r++) {
             for (uint c = 0; c < cols; c++) {
-                res_vert(r, c) = gray_img(r-1, c) - gray_img(r+1, c);
+				/*
+				if (r == 0) { //wrap-mirroring
+					res_vert(r, c) = gray_img(rows - 1, c) - gray_img(1, c);
+				}
+				else if (r == rows - 1) {
+					res_vert(r, c) = gray_img(r-1, c) - gray_img(r+1, c);
+				}
+				else 
+				*/
+				res_vert(r, c) = gray_img(r-1, c) - gray_img(0, c);
             }
         }
         
