@@ -34,7 +34,7 @@ typedef vector<pair<string, int> > TFileList;
 typedef vector<pair<vector<float>, int> > TFeatures;
 
 // C0NSTANTS:
-const int SEGMENTS = 8;
+const int SEGMENTS = 3;
 const int ANGULAR_SEGMENTS = 8; 
 
 // Load list of files and its labels from 'data_file' and
@@ -170,16 +170,17 @@ vector<float> hist(Matrix<double> Magn, Matrix<double> Dir) {
         for (uint c = 0; c < Magn.n_cols; c++) {
             int partition = int(Dir(r,c) / double(360/ANGULAR_SEGMENTS));
             if (Dir(r, c) == 360) { partition = 0; } // LOOPed;
-            cout << Dir(r, c) << "-- Angle\n";
-            cout << partition << "<- PARTITION\n";
-            if (!std::isnan(Dir(r, c)) && !std::isnan(Magn(r, c))) {
-                if (partition < ANGULAR_SEGMENTS && partition >= 0) {
-                    histogram[partition] += (Magn(r, c) <= 1000) ? Magn(r, c) : 1000; 
-                }
-            }
+			partition = (partition > 0) ? partition : ANGULAR_SEGMENTS;
+			partition = (partition < ANGULAR_SEGMENTS) ? partition : 0;
+            //cout << Dir(r, c) << "-- Angle\n";
+            //cout << partition << "<- PARTITION\n";
+            //if (!std::isnan(Dir(r, c)) && !std::isnan(Magn(r, c))) {
+                histogram[partition] += (Magn(r, c) <= 200) ? Magn(r, c)/100 : 10;
+            //}
         }
-        cout << "Halt!\n";
-        
+        //cout << "Halt!\n";
+		int i = 1;
+        for (auto elem : histogram) { cout << i++ << ": " << elem << "\n";};
     }
     return histogram;
 }
@@ -329,13 +330,16 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         
         // 2. Calculating HOG:
         auto mfv = hog(magnitude, direction);
+		for (auto elem : mfv) {
+			//cout << elem << ", ";
+		}
         
         // 3. 
         
         
-        vector<float> one_image_features;
-        one_image_features.push_back(1.0);
-        features->push_back(make_pair(one_image_features, 1));
+        vector<float> one_image_features = hog(magnitude, direction);
+        //one_image_features.push_back(1.0);
+        features->push_back(make_pair(one_image_features, data_set[image_idx].second));
         // End of sample code
         
 
