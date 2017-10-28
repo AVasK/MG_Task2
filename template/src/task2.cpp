@@ -35,7 +35,7 @@ typedef vector<pair<vector<float>, int> > TFeatures;
 
 // C0NSTANTS:
 const int SEGMENTS = 8;
-const int CELL_SIZE = 8; 
+const int ANGULAR_SEGMENTS = 8; 
 
 // Load list of files and its labels from 'data_file' and
 // stores it in 'file_list'
@@ -162,25 +162,51 @@ void save_image(const Image &im, const char *path)
         throw string("Error writing file ") + string(path);
 }
 
-// Calculating HOG of submatrices:
 
-vector<vector<int>> hog(Matrix<double> Magn, Matrix<double> Dir) {
+vector<float> hist(Matrix<double> Magn, Matrix<double> Dir) {
+    vector<float> histogram(ANGULAR_SEGMENTS, 0);
     
-}
-
-
-vector<int> hist(Matrix<double> Magn, Matrix<double> Dir) {
-    vector<int> histogram(SEGMENTS, 0);
-    
-    for (int r = 0; r < Magn.n_rows; r++) {
-        for (int c = 0; c < Magn.n_cols; c++) {
-            int partition = int(Magn(r,c) / double(360/SEGMENTS));
-            if (Magn(r, c) == 360) { partition = 0; } // LOOPed;
-            histogram[partition]++;
+    for (uint r = 0; r < Magn.n_rows; r++) {
+        for (uint c = 0; c < Magn.n_cols; c++) {
+            int partition = int(Dir(r,c) / double(360/ANGULAR_SEGMENTS));
+            if (Dir(r, c) == 360) { partition = 0; } // LOOPed;
+            cout << Dir(r, c) << "-- Angle\n";
+            cout << partition << "<- PARTITION\n";
+            if (!std::isnan(Dir(r, c)) && !std::isnan(Magn(r, c))) {
+                histogram[partition] += (Magn(r, c) <= 1000) ? Magn(r, c) : 1000; 
+            }
         }
+        cout << "Halt!\n";
+        
     }
     return histogram;
 }
+
+
+// Calculating HOG of submatrices:
+
+vector<float> hog(Matrix<double> Magn, Matrix<double> Dir) {
+    vector<float> img_hog;
+    
+    uint rows = Magn.n_rows;
+	uint cols = Magn.n_cols;
+    
+    for (uint i = 0; i < SEGMENTS; i++) {
+        for (uint j = 0; j < SEGMENTS; j++) {
+            auto hist_part = hist(
+                Magn.submatrix(i*rows/SEGMENTS, j*cols/SEGMENTS, 
+                    rows/SEGMENTS, cols/SEGMENTS),
+                Dir.submatrix(i*rows/SEGMENTS, j*cols/SEGMENTS, 
+                    rows/SEGMENTS, cols/SEGMENTS));
+            
+            for (auto &elem : hist_part) {
+                img_hog.push_back(elem);
+            }
+        }
+    }
+    return img_hog;
+}
+
 
 
 /*
@@ -269,7 +295,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
                 double g_x = res_horiz(r, c);
                 double g_y = res_vert(r, c);
                 magnitude(r, c) = std::sqrt(g_x * g_x + g_y * g_y);
-                direction(r, c) = 180/3.1415926 * std::atan2(g_y, g_x);
+                direction(r, c) = int(180/3.1415926 * std::atan2(g_y, g_x)) % 360;
 				direction(r, c) = (direction(r, c) > 0.0) ? direction(r, c) : (360.0 + direction(r, c));
             }
         }
@@ -300,7 +326,7 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         */
         
         // 2. Calculating HOG:
-        //auto HOG = hog(magnitude, direction);
+        auto mfv = hog(magnitude, direction);
         
         // 3. 
         
