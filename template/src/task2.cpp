@@ -101,6 +101,7 @@ Grayscale to_grayscale(BMP image) {
     uint rows = image.TellWidth();
     uint cols = image.TellHeight();
     
+	//cout << "size: " << cols << " : " << rows << "\n";
     Grayscale img(cols, rows);
     
     for (uint i = 0; i < rows; i++) {
@@ -142,6 +143,7 @@ Image Map_to_Img(Matrix<double> gray) {
     return temp;
 }
 
+// Copied from previous task's source code.
 void save_image(const Image &im, const char *path)
 {
     BMP out;
@@ -180,7 +182,7 @@ vector<float> hist(Matrix<double> Magn, Matrix<double> Dir) {
         }
         //cout << "Halt!\n";
 		int i = 1;
-        for (auto elem : histogram) { cout << i++ << ": " << elem << "\n";};
+        //for (auto elem : histogram) { cout << i++ << ": " << elem << "\n";};
     }
     return histogram;
 }

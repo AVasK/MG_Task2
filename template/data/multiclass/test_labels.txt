@@ -97,3 +97,6 @@ test/yoda/0011.bmp 6
 test/yoda/0012.bmp 6
 test/yoda/0013.bmp 6
 test/yoda/0014.bmp 6
+test/yoda/y1.bmp 6
+test/yoda/y2.bmp 6
+test/yoda/y3.bmp 6

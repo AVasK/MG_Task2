@@ -55,16 +55,6 @@ class BMP
  ebmpBYTE FindClosestColor( RGBApixel& input );
  const BMP& operator = (const BMP&);
  public:
- 
- /*
- ----------------------------
- ****      ** **      *****
- *  **    *** ***     **  **
- ****    ** *** **    *****
- *  **  ***  *  ***   **
- ****  ***       ***  **
- ----------------------------
- */
 
  int TellBitDepth( void );
  int TellWidth( void );

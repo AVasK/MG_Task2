@@ -27,7 +27,7 @@
 ../../data/multiclass/test/fighter/0006.bmp 2
 ../../data/multiclass/test/fighter/0007.bmp 2
 ../../data/multiclass/test/fighter/0008.bmp 2
-../../data/multiclass/test/fighter/0009.bmp 2
+../../data/multiclass/test/fighter/0009.bmp 1
 ../../data/multiclass/test/fighter/0010.bmp 2
 ../../data/multiclass/test/fighter/0011.bmp 2
 ../../data/multiclass/test/fighter/0012.bmp 2
@@ -97,4 +97,6 @@
 ../../data/multiclass/test/yoda/0012.bmp 6
 ../../data/multiclass/test/yoda/0013.bmp 6
 ../../data/multiclass/test/yoda/0014.bmp 6
-../../data/multiclass/test/yoda/0014.bmp 6
+../../data/multiclass/test/yoda/y1.bmp 6
+../../data/multiclass/test/yoda/y2.bmp 6
+../../data/multiclass/test/yoda/y3.bmp 6
