@@ -3,7 +3,7 @@
 ../../data/multiclass/test/droid/0003.bmp 1
 ../../data/multiclass/test/droid/0004.bmp 1
 ../../data/multiclass/test/droid/0005.bmp 1
-../../data/multiclass/test/droid/0006.bmp 2
+../../data/multiclass/test/droid/0006.bmp 1
 ../../data/multiclass/test/droid/0007.bmp 1
 ../../data/multiclass/test/droid/0008.bmp 1
 ../../data/multiclass/test/droid/0009.bmp 1
@@ -34,7 +34,7 @@
 ../../data/multiclass/test/fighter/0013.bmp 2
 ../../data/multiclass/test/fighter/0014.bmp 2
 ../../data/multiclass/test/fighter/0015.bmp 2
-../../data/multiclass/test/fighter/0016.bmp 2
+../../data/multiclass/test/fighter/0016.bmp 1
 ../../data/multiclass/test/fighter/0017.bmp 2
 ../../data/multiclass/test/fighter/0018.bmp 2
 ../../data/multiclass/test/lightsaber/0001.bmp 3

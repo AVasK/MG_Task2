@@ -1,3 +1,5 @@
+// AVasK - 2017 - Computer Graphics Course - Tasl 2
+
 #include <string>
 #include <vector>
 #include <fstream>
@@ -35,7 +37,7 @@ typedef vector<pair<vector<float>, int> > TFeatures;
 
 // C0NSTANTS:
 const int SEGMENTS = 12;
-const int ANGULAR_SEGMENTS = 8; 
+const int ANGULAR_SEGMENTS = 12; 
 const int CLR_SEGMENTS = 8;
 const int LBP_SEGMENTS = 8;
 
