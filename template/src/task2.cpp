@@ -36,6 +36,7 @@ typedef vector<pair<vector<float>, int> > TFeatures;
 // C0NSTANTS:
 const int SEGMENTS = 12;
 const int ANGULAR_SEGMENTS = 8; 
+const int CLR_SEGMENTS = 8;
 
 // Load list of files and its labels from 'data_file' and
 // stores it in 'file_list'
@@ -96,7 +97,7 @@ void SavePredictions(const TFileList& file_list,
 |||||||||||||||||||||||||||||||||||||||||||||||
 */
 
-// Returns entity of type Grayscale == Matrix<int>.
+// Returns entity of type Grayscale (== Matrix<int>).
 Grayscale to_grayscale(BMP image) {
     uint rows = image.TellWidth();
     uint cols = image.TellHeight();
@@ -114,6 +115,20 @@ Grayscale to_grayscale(BMP image) {
     return img;
 }
 
+Image BMP_to_Img(BMP image) {
+	uint bmp_rows = image.TellWidth();
+	uint bmp_cols = image.TellHeight(); // Messy BMP coordinates.
+	
+	Image temp(bmp_cols, bmp_rows);
+	
+	for (uint i = 0; i < bmp_rows; i++) {
+        for (uint j = 0; j < bmp_cols; j++) {
+            RGBApixel pixel = image.GetPixel(i,j);
+            temp(j, i) = std::tie(pixel.Red, pixel.Green, pixel.Blue);
+        }
+    }
+	return temp;
+}
 
 Image Gray_to_Img(Grayscale gray) {
     auto rows = gray.n_rows;
@@ -212,7 +227,54 @@ vector<float> hog(Matrix<double> Magn, Matrix<double> Dir) {
     return img_hog;
 }
 
+/*
 
+ ____     ____    ___      ____    ____
+//   \   /  _ \   | |     /  _ \   | > \
+||       | | ||   | |     | | ||   |  _/
+||       | |_||   | |__   | |_||   |  \
+\\___/   \____/   |____|  \____/   | \_\
+
+*/
+
+vector<float> Avg_Colour(Image cell) {
+	auto rows = cell.n_rows;
+	auto cols = cell.n_cols;
+	
+	vector<float> avg(3, 0.0); // 3 elements, all inited w 0.
+	int n = 0;
+	
+	for (uint r = 0; r < rows; r++) {
+		for (uint c = 0; c < cols; c++) {
+			avg[0] += std::get<0>(cell(r, c));
+			avg[1] += std::get<1>(cell(r, c));
+			avg[2] += std::get<2>(cell(r, c));
+			n++;
+		}
+	}
+	avg[0] /= n;
+	avg[1] /= n;
+	avg[2] /= n;
+	
+	return avg;
+}
+// Calculating Colour Features:
+vector<float> colour_features(Image img) {
+	vector<float> img_clr;
+	auto rows = img.n_rows;
+	auto cols = img.n_cols;
+	
+	for (uint i = 0; i < CLR_SEGMENTS; i++) {
+        for (uint j = 0; j < CLR_SEGMENTS; j++) {
+            auto avg = Avg_Colour(
+                img.submatrix(i*rows/CLR_SEGMENTS, j*cols/CLR_SEGMENTS, 
+                    rows/CLR_SEGMENTS, cols/CLR_SEGMENTS));
+            
+			for (auto elem : avg) {img_clr.push_back(elem/255);} // normalizing
+        }
+    }
+	return img_clr;
+}
 
 /*
 |||||||||||||||||||||||||||||||||||||||||||||||
@@ -277,6 +339,12 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         Matrix<double> res_horiz(rows, cols);
         
         // VERTICAL:
+		// r = 0: <MIRRORING EDGE-HANDLING> <if commented, gives "crop" method :) >
+		for (uint c = 0; c < cols; c++) { // mirroring looks strange btw.
+			res_vert(0, c) = gray_img(1, c) - gray_img(1, c);
+		}
+		
+		
         for (uint r = 1; r < rows - 1; r++) {
             for (uint c = 0; c < cols; c++) {
                 res_vert(r, c) = gray_img(r-1, c) - gray_img(r+1, c);
@@ -284,6 +352,11 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         }
         
         // HORIZONTAL:
+		// c = 0: <MIRRORING EDGE-HANDLING>
+		for (uint r = 0; r < rows; r++) {
+			res_horiz(r, 0) = gray_img(r, 1) - gray_img(r, 1);
+		}
+		
         for (uint r = 0; r < rows; r++) {
             for (uint c = 1; c < cols - 1; c++) {
                 res_horiz(r, c) = gray_img(r, c+1) - gray_img(r, c-1);
@@ -340,6 +413,8 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         
         
         vector<float> one_image_features = hog(magnitude, direction);
+		auto clr = colour_features(BMP_to_Img(*img));
+		one_image_features.insert(one_image_features.end(), clr.begin(), clr.end());
         //one_image_features.push_back(1.0);
         features->push_back(make_pair(one_image_features, data_set[image_idx].second));
         // End of sample code
