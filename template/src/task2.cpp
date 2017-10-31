@@ -37,6 +37,7 @@ typedef vector<pair<vector<float>, int> > TFeatures;
 const int SEGMENTS = 12;
 const int ANGULAR_SEGMENTS = 8; 
 const int CLR_SEGMENTS = 8;
+const int LBP_SEGMENTS = 8;
 
 // Load list of files and its labels from 'data_file' and
 // stores it in 'file_list'
@@ -87,6 +88,7 @@ void SavePredictions(const TFileList& file_list,
         stream << file_list[image_idx].first << " " << labels[image_idx] << endl;
     stream.close();
 }
+
 
 /*
 |||||||||||||||||||||||||||||||||||||||||||||||
@@ -179,6 +181,7 @@ void save_image(const Image &im, const char *path)
         throw string("Error writing file ") + string(path);
 }
 
+// Histogram of Submatrices, calculated into HOG():
 
 vector<float> hist(Matrix<double> Magn, Matrix<double> Dir) {
     vector<float> histogram(ANGULAR_SEGMENTS, 0);
@@ -227,6 +230,100 @@ vector<float> hog(Matrix<double> Magn, Matrix<double> Dir) {
     return img_hog;
 }
 
+// Additional Part 1: LBP:
+/*
+___          ____   ______    ___
+|  \   /\    |   \  | || |     | 
+|  |  /  \   |   |    ||       |
+|--- /====\  |---     ||       |
+|   /      \ | \\     ||      _|_
+
+*/ 
+
+// lazy normalizer
+vector<float> normalize (vector<float> arr) { // like a Min-Max normalizer, but without a Min)))
+    float max = -1;
+    for (auto elem : arr) {
+        if (elem > max) {
+            max = elem;
+        }
+    }
+    
+    if (max != 0) {
+        for (auto &elem : arr) {
+            elem /= max;
+        }
+    }
+    return arr;
+}
+
+class Lbp
+{
+public:
+    int vert_radius = 1; // C++11 syntax;
+    int hor_radius = 1;
+		
+	template<typename T>
+    uint operator () (const Matrix<T> &m) const
+    {
+		 uint h_size = 2 * hor_radius + 1;
+		 uint v_size = 2 * vert_radius + 1;
+
+		 vector<uint> temp;
+		 uint center = 0;
+  		 for (uint i = 0; i < v_size; i++) {
+  		     for (uint j = 0; j < h_size; j++) {
+  		        if ((i != 1) || (j !=1)) {
+					temp.push_back(std::get<0>(m(i, j)));
+				} else {
+					center = std::get<0>(m(i, j));
+				}
+  		     }
+  		 } 
+		 float ret = 0;
+		 for (uint i = 0; i < temp.size(); i++) {
+			if (temp[i] > center) {
+				ret += pow(2, i);
+			}
+		 }
+		
+		return ret; 
+    }
+};
+
+vector<float> histogram_lbp (Image m) 
+{
+	vector<float> hist(256, 0); // vector of 0 to 255 values, initialized with 0's.
+	Matrix<uint> mat = m.unary_map(Lbp());
+	for (uint i = 0; i < mat.n_rows; i++) {
+		for (uint j = 0; j < mat.n_cols; j++) {
+			hist[mat(i, j)]++;
+		}
+	}
+	
+	return hist;
+}
+
+
+vector<float> get_lbp (Image m)
+{
+	uint rows = m.n_rows;
+	uint cols = m.n_cols;
+	vector<float> ret;
+	for (int i = 0; i < LBP_SEGMENTS; i++) {
+		for (int j = 0; j < LBP_SEGMENTS; j++) {
+			vector<float> hist = histogram_lbp(m.submatrix(i*rows/LBP_SEGMENTS, j*cols/LBP_SEGMENTS,       
+                rows/LBP_SEGMENTS, cols/LBP_SEGMENTS));
+			hist = normalize(hist);	
+			ret.insert(ret.end(), hist.begin(), hist.end());
+		}
+	}
+		
+	return ret;
+}
+
+
+// Additional Part 2: Colour Features:
 /*
 
  ____     ____    ___      ____    ____
@@ -415,6 +512,9 @@ void ExtractFeatures(const TDataSet& data_set, TFeatures* features) {
         vector<float> one_image_features = hog(magnitude, direction);
 		auto clr = colour_features(BMP_to_Img(*img));
 		one_image_features.insert(one_image_features.end(), clr.begin(), clr.end());
+        
+        auto lbp = get_lbp(BMP_to_Img(*img));
+        one_image_features.insert(one_image_features.end(), lbp.begin(), lbp.end());
         //one_image_features.push_back(1.0);
         features->push_back(make_pair(one_image_features, data_set[image_idx].second));
         // End of sample code
