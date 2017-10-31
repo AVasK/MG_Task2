@@ -1,4 +1,4 @@
-// AVasK - 2017 - Computer Graphics Course - Tasl 2
+// AVasK - 2017 - Computer Graphics Course - Task 2
 
 #include <string>
 #include <vector>
